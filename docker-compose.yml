@@ -27,7 +27,6 @@ services:
     container_name: taxi-nginx
     ports:
       - "80:80"
-      - "443:443"
     depends_on:
       - frontend
       - backend
