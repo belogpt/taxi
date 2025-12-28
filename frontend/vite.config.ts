@@ -8,6 +8,6 @@ export default defineConfig({
     port: 5173,
   },
   preview: {
-    allowedHosts: ["progbel.ru"],
+    allowedHosts: ["progbel.ru", "www.progbel.ru"],
   },
 });
