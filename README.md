@@ -31,6 +31,16 @@ docker compose down
 - `nginx/` — конфигурация обратного прокси для фронтенда и API.
 - `docker-compose.yml` — оркестрация сервисов.
 
+## Запуск без Node.js на хосте
+
+Все зависимости ставятся внутри контейнеров. Достаточно Docker и Docker Compose:
+
+```bash
+docker compose up -d --build
+```
+
+По умолчанию фронтенд в контейнере Vite Preview слушает `0.0.0.0:4173` и принимает заголовки `Host` для `progbel.ru`, `www.progbel.ru` и `localhost`. При необходимости измените список в `VITE_ALLOWED_HOSTS` для сервиса `frontend` в `docker-compose.yml`.
+
 ## API
 
 `POST /api/calculate`

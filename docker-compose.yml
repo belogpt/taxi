@@ -17,6 +17,8 @@ services:
     container_name: taxi-frontend
     ports:
       - "4173:4173"
+    environment:
+      - VITE_ALLOWED_HOSTS=progbel.ru,www.progbel.ru,localhost
     restart: unless-stopped
     depends_on:
       - backend
