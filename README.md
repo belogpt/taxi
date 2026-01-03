@@ -15,7 +15,8 @@ docker compose up -d --build
 
 После сборки:
 
-- Фронтенд доступен на `http://localhost` (через Nginx).
+- По умолчанию Nginx внутри docker-проекта слушает 8080/8443 на хосте (чтобы не конфликтовать с системными сервисами). Меняются через переменные `NGINX_HTTP_PORT` и `NGINX_HTTPS_PORT`.
+- Фронтенд доступен на `http://localhost:8080` (если переменные не переопределялись).
 - API доступно по пути `/api` (прокси на backend).
 
 Остановка:
@@ -40,6 +41,35 @@ docker compose up -d --build
 ```
 
 По умолчанию фронтенд в контейнере Vite Preview слушает `0.0.0.0:4173` и принимает заголовки `Host` для `progbel.ru`, `www.progbel.ru` и `localhost`. При необходимости измените список в `VITE_ALLOWED_HOSTS` для сервиса `frontend` в `docker-compose.yml`.
+
+## Пример, если 443 уже занят (VPN/прочие сервисы)
+
+Контейнер Nginx можно публиковать на другие порты, а внешний TLS/80 оставить на хостовом прокси:
+
+1. Портами контейнера управляют переменные окружения:
+   ```bash
+   export NGINX_HTTP_PORT=8080
+   export NGINX_HTTPS_PORT=8443  # можно пропустить, если HTTPS на хосте
+   docker compose up -d --build
+   ```
+2. На хостовом Nginx (или другом фронт-прокси) настройте SNI для домена и проксируйте на контейнер:
+   ```nginx
+   server {
+     listen 80;
+     listen 443 ssl http2;
+     server_name progbel.ru www.progbel.ru;
+     ssl_certificate /path/to/cert.pem;
+     ssl_certificate_key /path/to/key.pem;
+     location / {
+       proxy_pass http://127.0.0.1:8080;
+       proxy_set_header Host $host;
+       proxy_set_header X-Real-IP $remote_addr;
+       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+       proxy_set_header X-Forwarded-Proto $scheme;
+     }
+   }
+   ```
+   Так другие службы на 443 (например, VLESS по IP) не мешают, а доменный трафик уходит в контейнер.
 
 ## API
 
