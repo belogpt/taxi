@@ -91,3 +91,13 @@ sudo certbot --nginx -d progbel.ru -d www.progbel.ru
 ```
 
 Certbot автоматически обновит конфигурацию Nginx для HTTPS. Для автоматического продления сертификатов certbot добавит системные таймеры/cron-задания.
+
+## Самоподписанный сертификат
+
+Для тестовой среды вы можете выпустить самоподписанный сертификат:
+
+```bash
+bash scripts/generate-self-signed-cert.sh example.com www.example.com
+```
+
+Скрипт создаст `nginx/certs/server.crt` и `nginx/certs/server.key`. Примонтируйте каталог `nginx/certs` в контейнер с Nginx (например, `./nginx/certs:/etc/nginx/certs:ro`) и укажите эти файлы в конфигурации Nginx (`ssl_certificate` и `ssl_certificate_key`).
